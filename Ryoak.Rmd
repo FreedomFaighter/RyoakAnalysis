@@ -1,0 +1,59 @@
+---
+title: "Ryoak Analysis"
+author: "John H. Freeman"
+date: "5/7/2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(ggplot2)
+require(gdata)
+require(MASS)
+require(broom)
+```
+
+#Exploration of Categorical Variables
+
+```{r echo=FALSE}
+industrialsales <- read.xls("spreadsheet.xlsx")
+industrialsales.trim <- industrialsales[complete.cases(industrialsales[,"Price.Per.SF"]),]
+industrialsales.trim <- industrialsales.trim[complete.cases(industrialsales.trim[,"Percent.Office"]),]
+industrialsales.trim <- industrialsales.trim[complete.cases(industrialsales.trim[,"Condition"]),]
+ggplot(industrialsales.trim, aes(Percent.Office,Price.Per.SF)) +
+  geom_point() + 
+  stat_smooth(method = "lm") + 
+  facet_wrap(~Condition)
+```
+It appears that there is no difference graphically in price per squarefoot for average rated properties as percentage of office increases.
+
+However, for "Good" rated properties there appears to be an effect on price per squarefoot as the percentage of office increases.
+
+There are only solitary points for "fair" and "avg to good" properties.
+
+##Transforming price per squarefoot
+
+```{r echo=FALSE}
+industrialsales.good <- industrialsales.trim[industrialsales.trim$Condition=="Good",]
+lm1 <- lm(Price.Per.SF ~ Percent.Office, data = industrialsales.good)
+bc <- boxcox(Price.Per.SF ~ Percent.Office, data=industrialsales.good, lambda = seq(-2,2,.01), plotit = FALSE)
+bc$x[which.max(bc$y)]
+industrialsales.good$Price.Per.SF0.05 = industrialsales.good$Price.Per.SF^bc$x[which.max(bc$y)]
+
+ggplot(industrialsales.good, aes(Percent.Office, Price.Per.SF0.05)) +
+  geom_point() + 
+  stat_smooth(method = "lm")
+```
+
+Transforming Price per Square foot by `r bc$x[which.max(bc$y)]` reveals a better predictive relationship however.
+
+```{r echo=FALSE}
+industrialsales.good$Office.SF <- industrialsales.good$Net.Rentable.Area * industrialsales.good$Percent.Office
+industrialsales.good$Warehouse.SF <- industrialsales.good$Net.Rentable.Area * (1-industrialsales.good$Percent.Office)
+lm2 <- lm(Price.Per.SF0.05 ~ Percent.Office, data=industrialsales.good)
+summary(lm2)
+tidy2 <- tidy(lm2)
+tidy2
+```
+
+From this relationship that for properties classified as good, that with no office space the base price per squarefoot is \$`r tidy2[1,2]` per Square Foot and increases by \$`r tidy2[2,2]` per Square Foot by each percentage increase in office space.
