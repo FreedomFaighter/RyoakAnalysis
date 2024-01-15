@@ -1,7 +1,7 @@
 #Ryoak analysis
 library(ggplot2)
 require(gdata)
-industrialsales <- read.xls("excel - industrial sales - Ryoak database.xlsx")
+industrialsales <- read.xls("spreadsheet.xlsx")
 industrialsales.trim <- industrialsales[complete.cases(industrialsales[,"Price.Per.SF"]),]
 
 firstMoment = sum(industrialsales.trim$Price.Per.SF)/length(industrialsales.trim$Price.Per.SF)
