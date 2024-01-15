@@ -4,7 +4,7 @@ require(gdata)
 require(stats)
 require(fitdistrplus)
 source('secant.r')
-industrialsales <- read.xls("excel - industrial sales - Ryoak database.xlsx")
+industrialsales <- read.xls("spreadsheet.xlsx")
 industrialsales.trim <- industrialsales[complete.cases(industrialsales[,"Price.Per.SF"]),]
 industrialsales.trim <- industrialsales.trim[industrialsales.trim$Price.Per.SF >= 10,]
 k = function(x)
