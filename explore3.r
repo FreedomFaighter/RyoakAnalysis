@@ -15,7 +15,7 @@ k = function(x)
 firstMoment = sum(industrialsales.trim$Price.Per.SF)/length(industrialsales.trim$Price.Per.SF)
 secondMoment = sum(industrialsales.trim$Price.Per.SF^2) / length(industrialsales.trim$Price.Per.SF)
 mu=log(firstMoment^2/sqrt(secondMoment))
-sd2 = log(secondMoment/firstMoment^2)
+sd2 = var(industrialsales.trim$Price.Per.SF)
 
 fit.industrial <- fitdist(industrialsales.trim$Price.Per.SF, "weibull")
 domain <- c(1:max(industrialsales.trim$Price.Per.SF))
